@@ -26,6 +26,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # device = torch.device("cpu")
 print('Device:', device)
 
+# 데이터 변환
 data_transform = transforms.Compose([transforms.Resize((224,224))
                                        ,transforms.ToTensor()
                                        ,transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
@@ -33,22 +34,26 @@ data_transform = transforms.Compose([transforms.Resize((224,224))
 import torchvision
 from torchvision import transforms
 
+# train과 valid 데이터 변환하여 가져오기
 trainset = torchvision.datasets.ImageFolder(root = "/content/drive/MyDrive/train/", transform = data_transform)
 validset = torchvision.datasets.ImageFolder(root = "/content/drive/MyDrive/val/", transform = data_transform)
 
 trainset.__getitem__(100)
 validset.__getitem__(10)
 
+# train과 valid의 데이터 갯수
 print(len(trainset))
 print(len(validset))
 print(trainset[0][0].size())
 print(validset[0][0].size())
 
+# wine, soju, sake 3개의 classes를 가진다.
 classes = trainset.classes
 class_names_to_idx = trainset.class_to_idx
 print(classes)
 print(class_names_to_idx)
 
+# train, valid 데이터를 섞어 가져온다.
 torch.manual_seed(1)
 train_loader = DataLoader(trainset, batch_size=4, shuffle=True, num_workers=0)
 valid_loader = DataLoader(validset, batch_size=4, shuffle=True, num_workers=0)
@@ -82,7 +87,7 @@ print(labels.shape)
 img_grid = utils.make_grid(images)
 imshow(img_grid)
 
-# +softmax
+# CNN을 사용 (3게의 convolusion layer, relu)
 class CNN(nn.Module):
     def __init__(self):
         super().__init__()
@@ -133,6 +138,7 @@ optimizer = optim.RMSprop(model.parameters(), lr=0.001)
 # 손실함수 다중 분류(CrossEntropyLoss)
 loss_function = nn.CrossEntropyLoss()
 
+# epoch를 10과 20 두 개를 사용하여 차이를 비교한다.
 n_epochs = 20
 best = 0
 
